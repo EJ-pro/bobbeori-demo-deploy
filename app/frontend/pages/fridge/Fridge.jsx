@@ -7,8 +7,8 @@ import imagePutting from '../../assets/extracted/images/image_putting.png'
 import { useAppDialog } from '../../components/AppDialog.jsx'
 import IngredientModal from '../../components/modals/IngredientModal'
 import ConfirmModal from '../../components/modals/ConfirmModal'
-import { initialIngredientFormData as initialFormData } from '../../mock/fridgeMock.js'
-import { API_URL } from '../../utils/api.js'
+import { demoIngredients, initialIngredientFormData as initialFormData } from '../../mock/fridgeMock.js'
+import { API_URL, DEMO_MODE } from '../../utils/api.js'
 import { trackEvent } from '../../utils/analytics.js'
 import {
   getIngredientImageUrl,
@@ -124,8 +124,8 @@ function Fridge() {
   const location = useLocation()
   const navigate = useNavigate()
   const ingredientImageCatalog = useIngredientImageCatalog()
-  const [ingredients, setIngredients] = useState([])
-  const [summary, setSummary] = useState(buildSummary([]))
+  const [ingredients, setIngredients] = useState(() => DEMO_MODE ? demoIngredients.map(normalizeIngredient) : [])
+  const [summary, setSummary] = useState(() => buildSummary(DEMO_MODE ? demoIngredients : []))
   const [activeFilter, setActiveFilter] = useState('전체')
   const [searchQuery, setSearchQuery] = useState('')
   const [sortType, setSortType] = useState('latest')
@@ -253,6 +253,10 @@ function Fridge() {
 
   // 백엔드에서 냉장고 목록과 요약 정보를 가져옵니다.
   const fetchFridgeData = async () => {
+    if (DEMO_MODE) {
+      setSummary(buildSummary(ingredients))
+      return
+    }
     const token = getToken()
     if (!token) {
       setSummary(buildSummary(ingredients))

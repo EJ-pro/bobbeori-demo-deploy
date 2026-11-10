@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Navigate, Routes, Route, useLocation, useNavig
 import {
   API_NOTICE_EVENT,
   API_URL,
+  DEMO_MODE,
   SESSION_EXPIRED_KEY,
   authenticatedFetch,
   isSessionExpiredError,
@@ -32,7 +33,7 @@ import RecipeRecommend from './pages/recipe_recommend/RecipeRecommend.jsx'
 import ShoppingList from './pages/shopping_list/ShoppingList.jsx'
 
 function RequireAuth({ children }) {
-  return localStorage.getItem('bobbeori-token')
+  return DEMO_MODE || localStorage.getItem('bobbeori-token')
     ? children
     : <Navigate to="/login" replace />
 }

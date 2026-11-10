@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import mascot from '../assets/mascot_avatar.webp'
-import { API_URL, showApiNotice } from '../utils/api.js'
+import { API_URL, DEMO_MODE, showApiNotice } from '../utils/api.js'
 import ChatWelcome from './ChatWelcome'
 import './FloatingChatbot.css'
 
@@ -132,6 +132,23 @@ function FloatingChatbot() {
     setMessages((prev) => [...prev, { role: 'user', text: visibleText }])
     setMessage('')
     setIsSending(true)
+
+    if (DEMO_MODE) {
+      window.setTimeout(() => {
+        const normalized = trimmed.replace(/\s/g, '')
+        let reply = '공개 데모에서는 대표 Multi-Agent 흐름을 확인할 수 있어요. “냉장고 재료로 저녁 추천해줘”라고 입력해보세요.'
+        if (normalized.includes('냉장고') || normalized.includes('저녁') || normalized.includes('추천')) {
+          reply = '냉장고의 두부, 계란, 양파를 확인했어요. 소비기한이 가까운 두부를 우선 사용해 대파 두부 계란찌개를 추천합니다. 부족한 대파와 된장은 장보기 목록에 담기 전 확인이 필요해요.'
+        } else if (normalized.includes('장보기')) {
+          reply = '부족한 재료는 대파 1대와 된장 1큰술이에요. 실제 서비스에서는 사용자 확인 후 Shopping Agent가 장보기 목록을 생성합니다.'
+        } else if (normalized.includes('일정') || normalized.includes('캘린더')) {
+          reply = '일정 등록은 데이터 변경 작업이라 바로 실행하지 않아요. 날짜와 제목을 확인한 뒤 Calendar Agent가 사용자 승인 후 등록합니다.'
+        }
+        setMessages((prev) => [...prev, { role: 'bot', text: reply, isTyping: true }])
+        setIsSending(false)
+      }, 650)
+      return
+    }
 
     try {
       const token = localStorage.getItem('bobbeori-token')

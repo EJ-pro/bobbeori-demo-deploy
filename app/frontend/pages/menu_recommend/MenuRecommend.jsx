@@ -17,6 +17,8 @@ import {
   menuRecommendProcess as process,
   recommendTemplates,
 } from '../../mock/menuRecommendMock.js'
+import { fridgeRecipeRecommendations } from '../../mock/fridgeRecipeMock.js'
+import { DEMO_MODE } from '../../utils/api.js'
 
 
 function ImageSlot({ src, alt = '', className = '' }) {
@@ -101,6 +103,30 @@ function MenuRecommend() {
   }
 
   const fetchRecommendations = async ({ refreshPool, excludeIds }) => {
+    if (DEMO_MODE) {
+      clearFlowTimers()
+      setSelectedIds([])
+      setError('')
+      setIsGenerating(true)
+      startProgressAnimation()
+      window.setTimeout(() => {
+        const demoItems = fridgeRecipeRecommendations.slice(0, filters.limit).map((recipe) => ({
+          recipe_id: recipe.id,
+          title: recipe.title,
+          category: recipe.category,
+          cooking_time_min: recipe.minutes,
+          difficulty: recipe.level,
+          main_image_url: recipe.image || null,
+          reason: recipe.reason,
+        }))
+        setGeneratedRecipes(demoItems)
+        setHasMore(false)
+        setHasRequested(true)
+        setActiveStep(process.length - 1)
+        setIsGenerating(false)
+      }, 1200)
+      return
+    }
     const token = window.localStorage.getItem('bobbeori-token')
     if (!token) {
       navigate('/login')

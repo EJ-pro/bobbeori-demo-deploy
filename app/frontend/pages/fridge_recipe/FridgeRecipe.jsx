@@ -4,8 +4,9 @@ import './FridgeRecipe.css'
 
 import imageHello from '../../assets/extracted/images/image_hello.png'
 import imageMenuRecommendation from '../../assets/extracted/images/image_menu_recommendation.png'
+import { fridgeRecipeRecommendations } from '../../mock/fridgeRecipeMock.js'
 import { readStoredRecipes, saveRecommendationResult, saveStoredRecipe } from '../../utils/savedRecipes.js'
-import { API_URL } from '../../utils/api.js'
+import { API_URL, DEMO_MODE } from '../../utils/api.js'
 import { trackEvent } from '../../utils/analytics.js'
 
 
@@ -36,6 +37,24 @@ function FridgeRecipe() {
   )
 
   const fetchRecommendations = async ({ refreshPool, excludeIds }) => {
+    if (DEMO_MODE) {
+      const demoItems = fridgeRecipeRecommendations.map((recipe, index) => ({
+        recipe_id: recipe.id,
+        title: recipe.title,
+        category: recipe.category,
+        difficulty: recipe.level,
+        serving_count: 1,
+        owned_ingredient_count: recipe.owned,
+        missing_ingredient_count: recipe.total - recipe.owned,
+        reason: recipe.reason,
+        main_image_url: recipe.image || null,
+      }))
+      setItems(refreshPool ? demoItems : demoItems.slice(0, 2))
+      setHasMore(refreshPool)
+      setHasRequested(true)
+      setIsLoading(false)
+      return
+    }
     const token = window.localStorage.getItem('bobbeori-token')
     if (!token) {
       navigate('/login')

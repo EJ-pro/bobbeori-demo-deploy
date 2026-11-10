@@ -1,6 +1,7 @@
 const configuredApiUrl = import.meta.env?.VITE_API_URL
+export const DEMO_MODE = import.meta.env?.VITE_DEMO_MODE === 'true'
 export const API_URL =
-  configuredApiUrl === undefined ? 'http://localhost:8000' : configuredApiUrl.replace(/\/$/, '')
+  DEMO_MODE ? '' : configuredApiUrl === undefined ? 'http://localhost:8000' : configuredApiUrl.replace(/\/$/, '')
 
 export const API_NOTICE_EVENT = 'bobbeori-api-notice'
 export const SESSION_EXPIRED_KEY = 'bobbeori-session-expired-alerted'
